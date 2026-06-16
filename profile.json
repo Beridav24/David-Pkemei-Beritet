@@ -1,0 +1,28 @@
+{
+  "name": "David Pkemei Beritet",
+  "email": "your-email@example.com",
+  "location": "Global",
+  "timezone": "UTC",
+  "skills": [
+    "Python",
+    "JavaScript",
+    "Full Stack Development",
+    "Web Development",
+    "Data Analysis"
+  ],
+  "experience_level": "Entry Level to Mid Level",
+  "job_preferences": {
+    "job_types": ["full-time", "contract", "freelance"],
+    "work_arrangements": ["remote", "onsite", "hybrid"],
+    "salary_range_min": 0,
+    "salary_range_max": 999999,
+    "industries": ["Technology", "Startups", "Software"]
+  },
+  "social_profiles": {
+    "github": "https://github.com/Beridav24",
+    "linkedin": "https://linkedin.com/in/your-profile",
+    "portfolio": "https://your-portfolio.com"
+  },
+  "availability": "Available immediately",
+  "notice_period": "2 weeks"
+}
