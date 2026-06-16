@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>David Pkemei Beritet - Interactive CV Pipeline</title>
+    <style>
+        :root {
+            --primary-blue: #0052cc;
+            --deep-blue: #071e43;
+            --electric-blue: #00d2ff;
+            --accent-gold: #f4c20d;
+            --text-dark: #1e293b;
+            --text-light: #64748b;
+            --bg-gradient: linear-gradient(135deg, #071e43 0%, #0052cc 100%);
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            line-height: 1.6;
+            color: var(--text-dark);
+            background-color: #f0f4f9;
+            margin: 0;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            background: #f4f7fc;
+        }
+
+        .autopilot-banner {
+            background: linear-gradient(90deg, #ff0055, #7a00ff, #00d2ff);
+            background-size: 300% 300%;
+            animation: glowAnimation 4s ease infinite;
+            color: white;
+            text-align: center;
+            padding: 12px;
+            font-weight: bold;
+            font-size: 0.95rem;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            letter-spacing: 1px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .live-dot {
+            width: 12px;
+            height: 12px;
+            background-color: #00ff66;
+            border-radius: 50%;
+            display: inline-block;
+            animation: pulse 1.5s infinite;
+        }
+
+        .cv-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(7, 30, 67, 0.15);
+            padding: 40px;
+            border-radius: 16px;
+            border: 1px solid rgba(0, 82, 204, 0.1);
+        }
+
+        .header-layout {
+            display: flex;
+            align-items: center;
+            background: var(--bg-gradient);
+            padding: 35px;
+            margin: -40px -40px 30px -40px;
+            border-radius: 16px 16px 0 0;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header-layout::after {
+            content: '';
+            position: absolute;
+            top: 0; right: 0; bottom: 0; left: 0;
+            background: linear-gradient(to bottom right, transparent, rgba(0,210,255,0.15));
+            pointer-events: none;
+        }
+
+        .profile-img-container {
+            flex: 0 0 160px;
+            margin-right: 35px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .profile-img {
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            object-fit: cover;
+            object-position: top center;
+            border: 4px solid var(--electric-blue);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.5), 0 0 40px rgba(0, 212, 255, 0.3);
+            background: #fff;
+            display: block;
+        }
+
+        .header-text {
+            flex: 1;
+            z-index: 1;
+        }
+
+        .header-text h1 {
+            margin: 0 0 5px 0;
+            font-size: 2.3rem;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header-text h2 {
+            color: var(--electric-blue);
+            margin: 0 0 12px 0;
+            font-size: 1.25rem;
+            font-weight: 500;
+        }
+
+        .badge-container {
+            display: flex;
+            gap: 12px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .innovation-badge {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid var(--electric-blue);
+            padding: 8px 16px;
+            border-radius: 20px;
+            color: white;
+            font-size: 0.85rem;
+            font-weight: bold;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .innovation-badge:hover {
+            background: var(--electric-blue);
+            color: var(--deep-blue);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 212, 255, 0.4);
+        }
+
+        .cv-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 35px;
+        }
+
+        h3.section-title {
+            color: var(--primary-blue);
+            border-bottom: 2px solid rgba(0, 82, 204, 0.15);
+            padding-bottom: 6px;
+            margin-top: 0;
+            margin-bottom: 18px;
+            text-transform: uppercase;
+            font-size: 1.1rem;
+            letter-spacing: 0.5px;
+        }
+
+        .sidebar {
+            background-color: rgba(240, 244, 249, 0.7);
+            padding: 25px;
+            border-radius: 12px;
+            border-top: 4px solid var(--primary-blue);
+        }
+
+        .sidebar-section {
+            margin-bottom: 30px;
+        }
+
+        .sidebar-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .contact-info p {
+            margin: 10px 0;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .skill-group-title {
+            font-weight: bold;
+            font-size: 0.9rem;
+            color: var(--deep-blue);
+            margin: 12px 0 6px 0;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .skill-list, .lang-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .skill-list li, .lang-list li {
+            font-size: 0.9rem;
+            margin-bottom: 6px;
+            padding-left: 18px;
+            position: relative;
+            color: #334155;
+        }
+
+        .skill-list li::before {
+            content: "✓";
+            color: var(--primary-blue);
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+
+        .lang-list li::before {
+            content: "•";
+            color: var(--electric-blue);
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+            font-size: 1.2rem;
+            line-height: 1;
+            top: -1px;
+        }
+
+        .main-content h3.section-title {
+            margin-top: 25px;
+        }
+
+        .main-content h3.section-title:first-child {
+            margin-top: 0;
+        }
+
+        .job-block, .edu-block, .ref-block {
+            margin-bottom: 25px;
+            padding-bottom: 25px;
+            border-bottom: 1px dashed rgba(0,0,0,0.08);
+        }
+
+        .job-block:last-child, .edu-block:last-child, .ref-block:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .job-title, .edu-title, .ref-title {
+            font-weight: bold;
+            color: var(--deep-blue);
+            margin: 0;
+            font-size: 1.1rem;
+        }
+
+        .job-meta, .edu-meta, .ref-meta {
+            font-style: italic;
+            color: var(--primary-blue);
+            font-size: 0.9rem;
+            margin: 4px 0 10px 0;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        .bullet-list {
+            padding-left: 20px;
+            margin: 8px 0;
+        }
+
+        .bullet-list li {
+            margin-bottom: 6px;
+            font-size: 0.95rem;
+            color: #334155;
+            text-align: justify;
+        }
+
+        .achievements-box {
+            background-color: rgba(0, 210, 255, 0.04);
+            border-left: 4px solid var(--electric-blue);
+            padding: 15px;
+            border-radius: 0 8px 8px 0;
+            margin-top: 15px;
+        }
+
+        .achievements-box h4 {
+            margin: 0 0 8px 0;
+            color: var(--deep-blue);
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        a {
+            color: var(--primary-blue);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        @keyframes glowAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.9); opacity: 0.6; }
+            50% { transform: scale(1.1); opacity: 1; box-shadow: 0 0 10px #00ff66; }
+            100% { transform: scale(0.9); opacity: 0.6; }
+        }
+
+        @media (max-width: 850px) {
+            .header-layout {
+                flex-direction: column;
+                text-align: center;
+                padding: 25px;
+            }
+            .profile-img-container {
+                margin-right: 0;
+                margin-bottom: 20px;
+            }
+            .cv-grid {
+                grid-template-columns: 1fr;
+                gap: 25px;
+            }
+            .job-meta, .edu-meta {
+                flex-direction: column;
+                gap: 2px;
+            }
+            .cv-container {
+                padding: 20px;
+            }
+            .header-layout {
+                margin: -20px -20px 20px -20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+
+<div class="cv-container">
+    
+    <!-- 24/7 AUTOPILOT BROADCAST CHANNEL -->
+    <div class="autopilot-banner">
+        <span class="live-dot"></span>
+        AI AUTOPILOT AGENT ACTIVATED: BROADCASTING TARGET TELEMETRY TO RECRUITERS 24/7
+    </div>
+
+    <!-- HEADER / PROFILE SECTION -->
+    <header class="header-layout">
+        <div class="profile-img-container">
+            <img class="profile-img" src="https://avatars.githubusercontent.com/u/1?v=4" alt="David Pkemei Beritet Graduation Portrait">
+        </div>
+        <div class="header-text">
+            <h1>DAVID PKEMEI BERITET</h1>
+            <h2>Biochemist | Biotechnologist | Computational Data Analyst</h2>
+            <p style="margin: 0; font-size: 0.95rem; opacity: 0.95; text-align: justify;">
+                Dedicated professional Biochemist and Biotechnologist specializing in computational analysis and data-driven biological research. Experienced in laboratory research, environmental biotechnology, and scientific data interpretation. Proficient in AI training workflows, data annotation, and building end-to-end analytical pipelines. Advanced technical expertise in python scripting, biological data mining, and tokenized system design.
+            </p>
+            <div class="badge-container">
+                <a href="https://beridav24.github.io/" class="innovation-badge" target="_blank">
+                    🌐 Portfolio Link
+                </a>
+                <a href="https://beridav24.github.io/EBOLA-VACINE-RESEARCH-PROPOSAL-STAGE-1-PROFESSIONALS-SUGGESTION/" class="innovation-badge" target="_blank">
+                    🧬 Ebola Vaccine Proposal Stage 1
+                </a>
+                <a href="https://github.com/Beridav24" class="innovation-badge" target="_blank">
+                    📄 GitHub Profile
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CV GRID -->
+    <div class="cv-grid">
+        
+        <!-- LEFT SIDEBAR -->
+        <aside class="sidebar">
+            
+            <!-- CONTACT INFO -->
+            <div class="sidebar-section contact-info">
+                <h3 class="section-title">Contacts</h3>
+                <p><b>📞 Phone:</b> +254 740182754</p>
+                <p><b>✉️ Email:</b> <a href="mailto:davidbritet24@gmail.com">davidbritet24@gmail.com</a></p>
+                <p><b>📍 Address:</b> Nairobi, Kenya</p>
+            </div>
+
+            <!-- CORE COMPETENCIES -->
+            <div class="sidebar-section">
+                <h3 class="section-title">Core Competencies</h3>
+                <ul class="skill-list">
+                    <li>Negotiation &amp; Persuasion</li>
+                    <li>Customer Service Excellence</li>
+                    <li>Professional Communication</li>
+                    <li>Conflict Resolution</li>
+                    <li>Problem Solving</li>
+                    <li>Time Management</li>
+                    <li>Relationship Building</li>
+                    <li>Emotional Intelligence</li>
+                    <li>Attention to Detail</li>
+                    <li>Team Leadership</li>
+                    <li>Decision Making</li>
+                </ul>
+            </div>
+
+            <!-- TECHNICAL SKILLS -->
+            <div class="sidebar-section">
+                <h3 class="section-title">Technical Skills</h3>
+                
+                <div class="skill-group-title">Biotech &amp; Bioinformatics</div>
+                <ul class="skill-list">
+                    <li>RNA-seq Analysis</li>
+                    <li>BLAST Sequence Alignment</li>
+                    <li>Genomic Data (FASTQ, BAM, VCF)</li>
+                    <li>Protein Structure Analysis</li>
+                    <li>Molecular Biology (PCR, ELISA)</li>
+                    <li>GCLP Lab Compliance</li>
+                </ul>
+
+                <div class="skill-group-title">Data Science &amp; AI</div>
+                <ul class="skill-list">
+                    <li>Python (Pandas, NumPy, Scikit-Learn)</li>
+                    <li>R &amp; Bioconductor Ecosystem</li>
+                    <li>SQL Databases &amp; Bash Scripting</li>
+                    <li>Data Labeling &amp; AI Annotation</li>
+                    <li>LLM Integration &amp; Training</li>
+                    <li>Data Visualization (Matplotlib, Seaborn)</li>
+                </ul>
+
+                <div class="skill-group-title">Business &amp; Marketing</div>
+                <ul class="skill-list">
+                    <li>SEO &amp; SEM Digital Marketing</li>
+                    <li>QuickBooks &amp; Bookkeeping</li>
+                    <li>Account &amp; CRM Management</li>
+                    <li>B2B Pharmaceutical Sales</li>
+                </ul>
+            </div>
+
+            <!-- LANGUAGES -->
+            <div class="sidebar-section">
+                <h3 class="section-title">Languages</h3>
+                <ul class="lang-list">
+                    <li><b>English</b> (Professional)</li>
+                    <li><b>Kiswahili</b> (Professional)</li>
+                    <li><b>Pokot</b> (Native)</li>
+                </ul>
+            </div>
+
+            <!-- CERTIFICATIONS -->
+            <div class="sidebar-section">
+                <h3 class="section-title">Certifications</h3>
+                <ul class="skill-list">
+                    <li>Licensed Scientific Researcher</li>
+                    <li>Scorpion Venom Researcher License</li>
+                    <li>Chartered Google Certified Typist (Level 2)</li>
+                    <li>Certified Professional Marketer / Data Analyst (In Progress)</li>
+                    <li>Kenya Primary &amp; Secondary Certificates</li>
+                </ul>
+            </div>
+
+        </aside>
+
+        <!-- RIGHT MAIN CONTENT -->
+        <main class="main-content">
+            
+            <!-- PROFESSIONAL EXPERIENCE -->
+            <section>
+                <h3 class="section-title">Professional Experience</h3>
+
+                <!-- EBOLA VACINE PROJECT -->
+                <div class="job-block">
+                    <h4 class="job-title">Principal Computational Bioinformatician (Ebola Research Project Stage 1)</h4>
+                    <div class="job-meta">
+                        <span>ResearchGate Global Open-Review Initiative</span>
+                        <span>June 2026 - Present</span>
+                    </div>
+                    <ul class="bullet-list">
+                        <li>Author of document <b>ID: EBOV-GP/DD-2026-NBI</b>, structuring a comprehensive Preclinical Research Proposal on high-throughput bioinformatics, AI-driven sequence annotation, and computational pharmacology.</li>
+                        <li>Designed predictive framework parameters for structural epitope selection and biopharmaceutical development tracking.</li>
+                    </ul>
+                </div>
+
+                <!-- BERIDAV COIN -->
+                <div class="job-block">
+                    <h4 class="job-title">Founder &amp; Principal Investigator (Fintech-Biotech Linkage)</h4>
+                    <div class="job-meta">
+                        <span>Beridav Coin | Kitengela Scorpio Breeding Farm &amp; Lab Site</span>
+                        <span>Jan 2024 - June 2026</span>
+                    </div>
+                    <ul class="bullet-list">
+                        <li>Spearheaded system architecture and tokenization mechanics for <b>Beridav Coin</b>, an innovative cryptocurrency directly asset-backed by high-value medicinal biochemistry yields.</li>
+                        <li>Directed specialized scorpion husbandry facility and target venom extraction operations. Emphasized data modeling workflows to map venom molecular profiles for selective oncology formulations.</li>
+                        <li>Configured financial metrics, managing stakeholder pipelines for drug-delivery infrastructure scaling. Published architecture schemas within the public domain under the Online Research Scientific Union.</li>
+                    </ul>
+                </div>
+
+                <!-- PAN PHARMACEUTICAL -->
+                <div class="job-block">
+                    <h4 class="job-title">Medical Representative &amp; Sales Executive</h4>
+                    <div class="job-meta">
+                        <span>Pan Pharmaceutical Limited | Nairobi, Kenya</span>
+                        <span>October 2022 - June 2023</span>
+                    </div>
+                    <ul class="bullet-list">
+                        <li>Accelerated B2B medical product distributions across pharmacies, hospitals, and medical practitioners, consistently breaking target thresholds month-over-month.</li>
+                        <li>Managed comprehensive client portfolios, pipeline logistics, and transaction auditing tools via automated QuickBooks platforms and CRM ecosystems.</li>
+                    </ul>
+                </div>
+
+                <!-- KEMRI & PONA HERBAL -->
+                <div class="job-block">
+                    <h4 class="job-title">Fieldwork Researcher &amp; Lead Biomining Analyst</h4>
+                    <div class="job-meta">
+                        <span>KEMRI Kilifi &amp; Pona Herbal Care Limited</span>
+                        <span>November 2021 - August 2022</span>
+                    </div>
+                    <ul class="bullet-list">
+                        <li>Conducted translational field assessments on natural product medicine frameworks, specialized nutritional additions, and medicinal cosmetics.</li>
+                        <li>Executed an advanced oncology extraction project profiling scorpion venom properties as a candidate therapeutic agent targeting breast cancer phenotypes via genomic sequence classifications.</li>
+                    </ul>
+                </div>
+
+                <!-- IEBC POLLING CLERK -->
+                <div class="job-block">
+                    <h4 class="job-title">Polling Clerk</h4>
+                    <div class="job-meta">
+                        <span>Independent Electoral and Boundaries Commission (IEBC) | Changamwe, Mombasa</span>
+                        <span>August 2017 &amp; August 2022</span>
+                    </div>
+                    <ul class="bullet-list">
+                        <li>Maintained flawless verification sequences, structural data auditing, and logistical security during high-scale civic voter tracking operations.</li>
+                    </ul>
+                </div>
+
+                <!-- BERIHERBPHAM ONLINE -->
+                <div class="job-block">
+                    <h4 class="job-title">Digital Marketing Specialist &amp; Content Writer</h4>
+                    <div class="job-meta">
+                        <span>Beriherbpham Online | Nyali, Coast, Kenya</span>
+                        <span>August 2016 - April 2021</span>
+                    </div>
+                    <ul class="bullet-list">
+                        <li>Engineered enterprise SEO/SEM strategies, directly scaling inbound sales pipelines and organic discovery parameters.</li>
+                        <li>Drafted and verified technical-medical copy sheets adhering to rigorous regulatory terms and brand compliance guidelines.</li>
+                    </ul>
+                </div>
+
+                <!-- PWANI UNIVERSITY ACADEMICIAN -->
+                <div class="job-block">
+                    <h4 class="job-title">Biochemistry &amp; Biotechnology Researcher</h4>
+                    <div class="job-meta">
+                        <span>Pwani University &amp; Research Laboratories | Kilifi, Kenya</span>
+                        <span>August 2016 - July 2021</span>
+                    </div>
+                    <ul class="bullet-list">
+                        <li>Conducted structured bench chemistry, environmental biotechnology assessments, and pharmaceutical process testing models.</li>
+                        <li>Worked as a freelance Data Science Analyst &amp; AI Annotation Specialist, establishing clean target data pipelines for machine learning evaluation frameworks.</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- KEY VALUED ACHIEVEMENTS -->
+            <section>
+                <h3 class="section-title">Ecosystem Achievements</h3>
+                
+                <div class="achievements-box">
+                    <h4>BERIDAV (Bitcoin Electronic Radio-frequency International Development Advanced Valuables)</h4>
+                    <p style="margin: 0; font-size: 0.9rem; color: #334155; text-align: justify;">
+                        An original blockchain and biometric financial technology framework founded by David Beritet. The platform introduces the paradigm of "Invisible Bitcoin," enabling wireless concurrency ledger transactions through body-frequency radio network scans secured by multi-layered biometric protocols, including DNA fingerprint validation, retinal matrices, and facial recognition mapping.
+                    </p>
+                </div>
+                <ul class="bullet-list" style="margin-top: 15px;">
+                    <li><b>Bioinformatic Discoveries:</b> Leveraged DNA sequencing workflows to identify crucial coding regions responsible for target peptide production within toxic biological venoms.</li>
+                    <li><b>Process Optimization:</b> Streamlined cross-departmental data paths, translating raw laboratory outputs into definitive mathematical metrics that increased structural yield capacities.</li>
+                    <li><b>Strategic Infrastructure:</b> Built operational quality control protocols from scratch, eliminating base system errors and enabling computational models to consistently exceed target goals.</li>
+                </ul>
+            </section>
+
+            <!-- EDUCATION HISTORY -->
+            <section>
+                <h3 class="section-title">Education History</h3>
+
+                <div class="edu-block">
+                    <h4 class="edu-title">Bachelor of Science in Biochemistry and Biotechnology</h4>
+                    <div class="edu-meta">
+                        <span>Pwani University (Kilifi, Kenya)</span>
+                        <span>Graduation: November 2021</span>
+                    </div>
+                    <ul class="bullet-list">
+                        <li><b>Classification:</b> Second-Class Honors (Upper Division)</li>
+                        <li><b>Affiliation:</b> Formal Member of the Online Research Scientific Union</li>
+                        <li><b>Dissertation Thesis:</b> <i>"Restoration of quarry mine in Baobab quarry site using casuarina species indicated restoration success by amylase activity."</i></li>
+                    </ul>
+                </div>
+
+                <div class="edu-block">
+                    <h4 class="edu-title">Kenya Certificate of Secondary Education (KCSE)</h4>
+                    <div class="edu-meta">
+                        <span>Kapenguria Boys' High School</span>
+                        <span>Graduation: November 2015</span>
+                    </div>
+                    <ul class="bullet-list">
+                        <li><b>Award:</b> High School Diploma</li>
+                        <li><b>Performance Index:</b> Mean Grade Score: B+</li>
+                    </ul>
+                </div>
+
+                <div class="edu-block">
+                    <h4 class="edu-title">Kenya Certificate of Primary Education (KCPE)</h4>
+                    <div class="edu-meta">
+                        <span>Chepkono Primary School</span>
+                        <span>Graduation: 2010</span>
+                    </div>
+                    <ul class="bullet-list">
+                        <li><b>Performance Index:</b> Mean Grade Score: C</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- ACADEMIC AND PROFESSIONAL REFEREES -->
+            <section>
+                <h3 class="section-title">Academic &amp; Professional Referees</h3>
+
+                <div class="ref-block">
+                    <h4 class="ref-title">Prof. Suhila Hashim, PhD</h4>
+                    <div class="ref-meta">
+                        <span>Associate Professor &amp; Manager, Biosciences Research Centre (PUBRIC)</span>
+                        <span>Pwani University</span>
+                    </div>
+                    <p style="margin: -5px 0 0 0; font-size: 0.9rem; color: #334155;">
+                        📧 Email: <a href="mailto:suhila@squ.edu.om">suhila@squ.edu.om</a> | 📞 Phone: 0725916145
+                    </p>
+                </div>
+
+                <div class="ref-block">
+                    <h4 class="ref-title">Dr. Evelyne Isoe, PhD</h4>
+                    <div class="ref-meta">
+                        <span>Senior Scientific Researcher &amp; Biotechnology Frameworks Lead</span>
+                        <span>Pwani University</span>
+                    </div>
+                    <p style="margin: -5px 0 0 0; font-size: 0.9rem; color: #334155;">
+                        📞 Phone: +254733434674
+                    </p>
+                </div>
+            </section>
+
+        </main>
+
+    </div>
+
+</div>
+
+<!-- INTERACTIVE BACKGROUND SIMULATION CODE -->
+<script>
+    const canvas = document.getElementById('bg-canvas');
+    const ctx = canvas.getContext('2d');
+
+    let points = [];
+    const numPoints = 45;
+    const maxDistance = 120;
+
+    function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    class Point {
+        constructor() {
+            this.x = Math.random() * canvas.width;
+            this.y = Math.random() * canvas.height;
+            this.vx = (Math.random() - 0.5) * 0.6;
+            this.vy = (Math.random() - 0.5) * 0.6;
+            this.radius = Math.random() * 2 + 1.5;
+        }
+
+        update() {
+            this.x += this.vx;
+            this.y += this.vy;
+
+            if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+            if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+        }
+
+        draw() {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(0, 82, 204, 0.25)';
+            ctx.fill();
+        }
+    }
+
+    for (let i = 0; i < numPoints; i++) {
+        points.push(new Point());
+    }
+
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        for (let i = 0; i < points.length; i++) {
+            let p1 = points[i];
+            p1.update();
+            p1.draw();
+
+            for (let j = i + 1; j < points.length; j++) {
+                let p2 = points[j];
+                let dist = Math.hypot(p1.x - p2.x, p1.y - p2.y);
+
+                if (dist < maxDistance) {
+                    ctx.beginPath();
+                    ctx.moveTo(p1.x, p1.y);
+                    ctx.lineTo(p2.x, p2.y);
+                    ctx.strokeStyle = `rgba(0, 210, 255, ${0.18 * (1 - dist / maxDistance)})`;
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                }
+            }
+        }
+        requestAnimationFrame(animate);
+    }
+    animate();
+</script>
+
+</body>
+</html>
